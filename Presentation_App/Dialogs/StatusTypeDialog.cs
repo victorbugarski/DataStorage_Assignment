@@ -20,7 +20,7 @@ public class StatusTypeDialog(IStatusTypeService statusTypeService) : IStatusTyp
 
 
         var result = await _statusTypeService.CreateStatusTypeAsync(statusType);
-        if (result != null)
+        if (result == null)
             Console.WriteLine("\nStatus type was created successfully.");
         else
             Console.WriteLine("\nStatus type was not created.");
@@ -108,7 +108,11 @@ public class StatusTypeDialog(IStatusTypeService statusTypeService) : IStatusTyp
 
         var statusType = await _statusTypeService.GetStatusTypeByIdAsync(statusId);
         if (statusType == null)
+        {
             Console.WriteLine("Status was not found.");
+            return;
+
+        }
 
         var result = await _statusTypeService.DeleteStatusTypeAsync(statusType.Id);
         if (result)

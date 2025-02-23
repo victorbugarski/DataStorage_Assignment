@@ -1,8 +1,10 @@
-﻿using Business.Dtos;
+﻿using System.Diagnostics;
+using Business.Dtos;
 using Business.Factories;
 using Business.Interfaces;
 using Business.Models;
 using Data.Interfaces;
+using Data.Repositories;
 
 
 namespace Business.Services;
@@ -52,15 +54,21 @@ public class CustomerService(ICustomerRepository customerRepository) : ICustomer
     }
 
 
-    // CHAT GPT KOD
     public async Task<bool> DeleteCustomerAsync(int id)
     {
-        var existingCustomer = await _customerRepository.GetAsync(x => x.Id == id);
-        if ( existingCustomer != null )
+        var customerEntity = await _customerRepository.GetAsync(x => x.Id == id);
+        if (customerEntity == null)
+            return false;
+
+        try
         {
+            var result = await _customerRepository.DeleteAsync(customerEntity);
+            return result;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex.Message);
             return false;
         }
-
-        return await _customerRepository.DeleteAsync(x => x.Id == id);
     }
 }

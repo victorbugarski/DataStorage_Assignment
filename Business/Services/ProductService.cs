@@ -1,8 +1,10 @@
-﻿using Business.Dtos;
+﻿using System.Diagnostics;
+using Business.Dtos;
 using Business.Factories;
 using Business.Interfaces;
 using Business.Models;
 using Data.Interfaces;
+using Data.Repositories;
 
 
 namespace Business.Services;
@@ -45,6 +47,8 @@ public class ProductService(IProductRepository productRepository) : IProductServ
         if (existingProduct != null)
         {
             existingProduct.ProductName = form.ProductName;
+            existingProduct.ProductDescription = form.ProductDescription;
+            existingProduct.Price = form.Price;
             existingProduct.Id = form.Id;
 
             await _productRepository.UpdateAsync(existingProduct);
@@ -54,17 +58,23 @@ public class ProductService(IProductRepository productRepository) : IProductServ
 
     public async Task<bool> DeleteProductAsync(int id)
     {
+        var productEntity = await _productRepository.GetAsync(x => x.Id == id);
+        if (productEntity == null)
+            return false;
 
-        var existingCustomer = await _productRepository.GetAsync(x => x.Id == id);
-        if (existingCustomer != null)
+        try
         {
+            var result = await _productRepository.DeleteAsync(productEntity);
+            return result;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex.Message);
             return false;
         }
-
-        return await _productRepository.DeleteAsync(x => x.Id == id);
     }
 
-    
+
 }
 
 

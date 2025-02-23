@@ -14,7 +14,7 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
     public virtual async Task<TEntity> CreateAsync(TEntity entity)
     {
         if (entity == null)
-            return null!;
+            throw new ArgumentNullException(nameof(entity));
 
         try
         {
@@ -26,7 +26,7 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
         catch (Exception ex)
         {
             Debug.WriteLine($"Error creating {nameof(TEntity)} entity :: {ex.Message}");
-            return null!;
+            throw;
         }
     }
 
@@ -40,7 +40,7 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
         if (expression == null)
             return null!;
 
-        return await _dbSet.FirstOrDefaultAsync(expression) ?? null!; //FEl
+        return await _dbSet.FirstOrDefaultAsync(expression) ?? null!; 
     }
 
     public virtual async Task<TEntity> UpdateAsync(TEntity updatedEntity)
@@ -63,18 +63,15 @@ public abstract class BaseRepository<TEntity>(DataContext context) : IBaseReposi
         }
     }
 
-    public virtual async Task<bool> DeleteAsync(Expression<Func<TEntity, bool>> expression)
+    public virtual async Task<bool> DeleteAsync(TEntity entity)
     {
-        if (expression == null)
+        if (entity == null)
             return false;
 
         try
         {
-            var existingEntity = await _dbSet.FirstOrDefaultAsync(expression) ?? null!;
-            if (existingEntity == null)
-                return false;
 
-            _dbSet.Remove(existingEntity);
+            _dbSet.Remove(entity);
             await _context.SaveChangesAsync();
             return true;
 

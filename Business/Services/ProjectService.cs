@@ -1,8 +1,10 @@
-﻿using Business.Dtos;
+﻿using System.Diagnostics;
+using Business.Dtos;
 using Business.Factories;
 using Business.Interfaces;
 using Business.Models;
 using Data.Interfaces;
+using Data.Repositories;
 
 namespace Business.Services;
 
@@ -12,11 +14,19 @@ public class ProjectService(IProjectRepository projectRepository) : IProjectServ
 
     public async Task<Project?> CreateProjectAsync(ProjectRegistrationForm form)
     {
-        var projectEntity = await _projectRepository.GetAsync(x => x.Title == form.Title);
+        var existingProject = await _projectRepository.GetAsync(x => x.Title == form.Title);
+
+        if (existingProject != null)
+        {
+            return ProjectFactory.Create(existingProject);
+        }
+
         var entity = ProjectFactory.Create(form);
         await _projectRepository.CreateAsync(entity!);
 
-        return ProjectFactory.Create(projectEntity!);
+        var createdProject = await _projectRepository.GetAsync(x => x.Title == form.Title);
+
+        return createdProject != null ? ProjectFactory.Create(createdProject) : null;
     }
 
 
@@ -50,14 +60,20 @@ public class ProjectService(IProjectRepository projectRepository) : IProjectServ
     }
     public async Task<bool> DeleteProjectAsync(int id)
     {
+        var projectEntity = await _projectRepository.GetAsync(x => x.Id == id);
+        if (projectEntity == null)
+            return false;
 
-        var existingProject = await _projectRepository.GetAsync(x => x.Id == id);
-        if (existingProject != null)
+        try
         {
+            var result = await _projectRepository.DeleteAsync(projectEntity);
+            return result;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex.Message);
             return false;
         }
-
-        return await _projectRepository.DeleteAsync(x => x.Id == id);
     }
 }
 

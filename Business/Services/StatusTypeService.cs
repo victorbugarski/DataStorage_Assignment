@@ -1,8 +1,10 @@
-﻿using Business.Dtos;
+﻿using System.Diagnostics;
+using Business.Dtos;
 using Business.Factories;
 using Business.Interfaces;
 using Business.Models;
 using Data.Interfaces;
+using Data.Repositories;
 
 namespace Business.Services;
 
@@ -50,13 +52,20 @@ public class StatusTypeService(IStatusTypeRepository statusTypeRepository) : ISt
     }
     public async Task<bool> DeleteStatusTypeAsync(int id)
     {
-        var existingStatus = await _statusTypeRepository.GetAsync(x => x.Id == id);
-        if (existingStatus != null)
+        var statusTypeEntity = await _statusTypeRepository.GetAsync(x => x.Id == id);
+        if (statusTypeEntity == null)
+            return false;
+
+        try
         {
+            var result = await _statusTypeRepository.DeleteAsync(statusTypeEntity);
+            return result;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex.Message);
             return false;
         }
-
-        return await _statusTypeRepository.DeleteAsync(x => x.Id == id);
     }
 }
 

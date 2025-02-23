@@ -36,18 +36,15 @@ public class ProjectDialog(IProjectService projectService) : IProjectDialog
         {
             project.EndDate = endDate;
         }
-        else
-        {
-            Console.WriteLine("Invalid End Date. Please Use format yyyy-MM-dd.");
-        }
+        
         Console.Write("Customer ID: ");
         project.CustomerId = Convert.ToInt32(Console.ReadLine())!;
         Console.Write("Status ID: ");
         project.StatusId = Convert.ToInt32(Console.ReadLine())!;
         Console.Write("User ID: ");
         project.UserId = Convert.ToInt32(Console.ReadLine())!;
-        Console.Write("Product ID: ");
-        project.ProductId = Convert.ToInt32(Console.ReadLine())!;
+        //Console.Write("Product ID: ");
+        //project.ProductId = Convert.ToInt32(Console.ReadLine())!;
 
 
         var result = await _projectService.CreateProjectAsync(project);
@@ -223,7 +220,10 @@ public class ProjectDialog(IProjectService projectService) : IProjectDialog
 
         var project = await _projectService.GetProjectByIdAsync(projectId);
         if (project == null)
+        {
             Console.WriteLine("Project was not found.");
+            return;
+        }
 
         var result = await _projectService.DeleteProjectAsync(project.Id);
         if (result)

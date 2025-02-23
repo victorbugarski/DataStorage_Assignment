@@ -123,7 +123,10 @@ public class CustomerDialogs(ICustomerService customerService) : ICustomerDialog
 
         var customer = await _customerService.GetCustomerByIdAsync(customerId);
         if (customer == null)
+        {
             Console.WriteLine("Customer was not found.");
+            return;
+        }
         
         var result = await _customerService.DeleteCustomerAsync(customer.Id);
         if (result)

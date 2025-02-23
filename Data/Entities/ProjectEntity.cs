@@ -28,4 +28,5 @@ public class ProjectEntity
 
     public int ProductId { get; set; }
     public ProductEntity Product { get; set; } = null!;
+
 }

@@ -11,7 +11,13 @@ namespace Business.Factories;
     public static ProjectUpdateForm CreateUpdateForm() => new();
 
 
-    public static ProjectEntity? Create(ProjectRegistrationForm form) => form == null ? null : new()
+    public static ProjectEntity? Create(ProjectRegistrationForm form)
+    {
+
+        if (form == null) return null;
+
+
+        return new ProjectEntity
         {
             Title = form.Title,
             Description = form.Description,
@@ -21,7 +27,9 @@ namespace Business.Factories;
             StatusId = form.StatusId,
             UserId = form.UserId,
             ProductId = form.ProductId
+
         };
+    }
 
         public static Project? Create(ProjectEntity entity) => entity == null ? null : new()
         {

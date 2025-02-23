@@ -1,4 +1,5 @@
-﻿using Business.Dtos;
+﻿using System.Diagnostics;
+using Business.Dtos;
 using Business.Factories;
 using Business.Interfaces;
 using Business.Models;
@@ -61,16 +62,21 @@ public class UserService(IUserRepository userRepository) : IUserService
         return true;
     }
 
-    // Små delar av Chat GPT
     public async Task<bool> DeleteUserAsync(int id)
     {
-        var existingUser = await _userRepository.GetAsync(x => x.Id == id);
-        if (existingUser != null)
+        var userEntity = await _userRepository.GetAsync(x => x.Id == id);
+        if (userEntity == null)
+            return false;
+
+        try
         {
+            var result = await _userRepository.DeleteAsync(userEntity);
+            return result;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex.Message);
             return false;
         }
-
-        return await _userRepository.DeleteAsync(x => x.Id == id);
-        
     }
 }

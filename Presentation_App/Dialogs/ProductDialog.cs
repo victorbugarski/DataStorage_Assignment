@@ -138,7 +138,10 @@ public class ProductDialog(IProductService productService) : IProductDialog
 
         var product = await _productService.GetProductByIdAsync(productId);
         if (product == null)
+        {
             Console.WriteLine("Product was not found.");
+            return;
+        }
 
         var result = await _productService.DeleteProductAsync(product.Id);
         if (result)

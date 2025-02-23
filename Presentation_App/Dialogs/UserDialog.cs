@@ -123,7 +123,10 @@ public class UserDialog(IUserService userService) : IUserDialog
 
         var user = await _userService.GetUserByIdAsync(userId);
         if (user == null)
+        {
             Console.WriteLine("User was not found.");
+            return;
+        }
 
         var result = await _userService.DeleteUserAsync(user.Id);
         if (result)
